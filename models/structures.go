@@ -14,9 +14,3 @@ type Responce struct {
 	Expiry        time.Duration `json:"expiry"`
 	RateRemaining int           `json:"rate_remaining"`
 }
-
-type AppError struct {
-	Message       string `json:"message"`
-	ErrorCode     int    `json:"error_code"`
-	ErrorLocation string `json:"error_location"`
-}

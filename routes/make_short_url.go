@@ -11,10 +11,18 @@ func MakeShortUrl(c *fiber.Ctx) error {
 
 	reqBody := new(models.Request)
 	resBody := new(models.Responce)
-	ss := "12"
-	err := json.Unmarshal(c.Body(), ss)
+	err := json.Unmarshal(c.Body(), reqBody)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{})
+		return models.AppError.SendError(
+			models.AppError{
+				RealMessage:   err.Error(),
+				Message:       "Unable to parse the body",
+				ErrorCode:     fiber.StatusInternalServerError,
+				ErrorLocation: "from MakeShortUrl, json.Unmarshal",
+			},
+			c,
+		)
+
 	}
 	resBody.NewUrl = reqBody.CustomShortUrl
 	resBody.Url = reqBody.Url
