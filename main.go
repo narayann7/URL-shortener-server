@@ -4,19 +4,15 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/narayann7/gourl/routes"
 	"github.com/narayann7/gourl/services"
 )
 
 func main() {
 
 	app := fiber.New()
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.JSON(
-			fiber.Map{
-				"hello": "world",
-			},
-		)
-	})
+
+	routes.RoutesInit(app)
 
 	port := ":" + services.Getenv("PORT")
 	listenError := app.Listen(port)
