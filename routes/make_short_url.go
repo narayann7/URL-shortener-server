@@ -18,7 +18,6 @@ func MakeShortUrl(c *fiber.Ctx) error {
 	if err != nil {
 
 		panic(srv.AppError{
-			RealMessage:   err.Error(),
 			Message:       "Unable to parse the body",
 			ErrorCode:     fiber.StatusInternalServerError,
 			ErrorLocation: "from MakeShortUrl, json.Unmarshal",
