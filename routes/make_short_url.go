@@ -5,23 +5,24 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/narayann7/gourl/models"
+	srv "github.com/narayann7/gourl/services"
 )
 
 func MakeShortUrl(c *fiber.Ctx) error {
+	defer srv.Catch(c)
 
 	reqBody := new(models.Request)
 	resBody := new(models.Responce)
-	err := json.Unmarshal(c.Body(), reqBody)
+	s := ""
+	err := json.Unmarshal(c.Body(), s)
 	if err != nil {
-		return models.AppError.SendError(
-			models.AppError{
-				RealMessage:   err.Error(),
-				Message:       "Unable to parse the body",
-				ErrorCode:     fiber.StatusInternalServerError,
-				ErrorLocation: "from MakeShortUrl, json.Unmarshal",
-			},
-			c,
-		)
+
+		panic(srv.AppError{
+			RealMessage:   err.Error(),
+			Message:       "Unable to parse the body",
+			ErrorCode:     fiber.StatusInternalServerError,
+			ErrorLocation: "from MakeShortUrl, json.Unmarshal",
+		})
 
 	}
 	resBody.NewUrl = reqBody.CustomShortUrl
