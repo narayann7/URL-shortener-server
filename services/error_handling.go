@@ -3,6 +3,7 @@ package services
 import (
 	"log"
 	"reflect"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -14,6 +15,11 @@ type AppError struct {
 	ErrorLocation string `json:"error_location"`
 }
 
+func (appError AppError) Error() string {
+	var errorString string = "RealMessage : " + appError.RealMessage + " , " + "Message : " + appError.Message + " , " + "ErrorLocation : " + appError.ErrorLocation + " , " + "ErrorCode" + strconv.Itoa(appError.ErrorCode)
+	return errorString
+}
+
 /*
 general panic code is must
 	panic(fiber.Map{
@@ -23,11 +29,11 @@ general panic code is must
 
 */
 
-func Catch(c *fiber.Ctx) error {
+func CatchErrors(c *fiber.Ctx) error {
 
 	appError := recover()
 	if appError != nil {
-		// log.Println(appError)
+		log.Printf("%+v", appError)
 
 		var interFacetype = (reflect.TypeOf(appError))
 		log.Printf("interFace type ------> " + interFacetype.String())

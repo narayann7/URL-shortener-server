@@ -12,7 +12,7 @@ var Ctx = context.Background()
 func DatabaseInit(dbId int) *redis.Client {
 
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("rdb_url"),
+		Addr:     os.Getenv("RDB_URL"),
 		Password: "",
 		DB:       dbId,
 	})
