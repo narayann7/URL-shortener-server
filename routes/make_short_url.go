@@ -5,15 +5,18 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/narayann7/gourl/models"
-	"github.com/narayann7/gourl/services"
 	srv "github.com/narayann7/gourl/services"
 )
 
 func MakeShortUrl(c *fiber.Ctx) error {
+	//recover the panic and send as respond
+	//with suitable message and status code
 	defer srv.CatchErrors(c)
-
+	//create new request Struct
 	reqBody := new(models.Request)
+	//parce the json string to Request Struct
 	err := json.Unmarshal(c.Body(), reqBody)
+	//if error painc
 	if err != nil {
 		panic(srv.AppError{
 			RealMessage:   err.Error(),
@@ -24,18 +27,33 @@ func MakeShortUrl(c *fiber.Ctx) error {
 	}
 	//rate limiting
 
-	//check for valid url
-	if !services.IsVaildUrl(reqBody.Url) {
+	//	check for valid url
+	if !srv.IsVaildUrl(reqBody.Url) {
+		errorMessage := ""
+		if reqBody.Url == "" {
+			errorMessage = "url parameter is require"
+		} else {
+			errorMessage = "not a valid url"
+		}
 		panic(srv.AppError{
-			Message:   "not a valid url",
+			Message:   errorMessage,
 			ErrorCode: 400,
 		})
 
 	}
 
 	//check for domain error
+	if err := srv.CheckForDominError(reqBody.Url); !err {
+		panic(srv.AppError{
+			Message:   "this url is not allowed",
+			ErrorCode: 400,
+		})
+	}
 
 	//enforce http
+	reqBody.Url = srv.EnforceHttp(reqBody.Url)
+
+	srv.GetNewHash()
 
 	return c.JSON(fiber.Map{
 		"result": reqBody,
