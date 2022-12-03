@@ -12,7 +12,7 @@ import (
 
 func main() {
 
-	if isDev, _ := strconv.ParseBool(services.Getenv("IS_DEV")); isDev {
+	if isDev, _ := strconv.ParseBool(services.Getenv("IS_DEV")); !isDev {
 		app := fiber.New()
 		//-----------init--------------//
 		//logger for logging request

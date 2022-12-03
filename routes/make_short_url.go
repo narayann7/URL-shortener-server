@@ -49,7 +49,34 @@ func MakeShortUrl(c *fiber.Ctx) error {
 		//if expiry is 0 by default url is vaild for 1440 minutes which is 1 day
 		reqBody.Expiry = time.Minute * 1440
 	} else {
-		srv.CheckForVaildExpiry(reqBody.Expiry)
+		vaild := srv.CheckForVaildExpiry(reqBody.Expiry)
+		if !vaild {
+			panic(srv.AppError{
+				Message:   "invaild expiry. expiry will be in minutes",
+				ErrorCode: 400,
+			})
+		}
+	}
+
+	if len(reqBody.CustomShortUrl) != 0 {
+		//check for vaild custom url
+		isVaildCustomUrl := srv.CheckForVaildCustomUrl(reqBody.CustomShortUrl)
+		if !isVaildCustomUrl {
+			panic(srv.AppError{
+				Message:       "invaild custom Url",
+				RealMessage:   "custom Url should consist of Alphabets and digits and size of url should 8 in length",
+				ErrorLocation: "CheckForVaildCustomUrl",
+				ErrorCode:     400,
+			})
+		} else if !database.CheckIsHashUnique(reqBody.CustomShortUrl) {
+			//if its valid check that its already used or not
+			panic(srv.AppError{
+				Message:   "custom url is already in use",
+				ErrorCode: 400,
+			})
+		}
+	} else {
+		reqBody.CustomShortUrl = ""
 	}
 
 	//check for domain error
@@ -61,10 +88,17 @@ func MakeShortUrl(c *fiber.Ctx) error {
 	}
 	//enforce http
 	reqBody.Url = srv.EnforceHttp(reqBody.Url)
+
 	//create a unique hash for the url
 	urlHash := database.GetNewHash()
 	//store the url with url hash and expiry in db
-	database.SetUrlInDb(reqBody.Url, urlHash, reqBody.Expiry)
+	result := database.SetUrlInDb(reqBody.Url, urlHash, reqBody.Expiry)
+	if !result {
+		panic(srv.AppError{
+			Message:   "Something went wrong",
+			ErrorCode: 500,
+		})
+	}
 
 	return c.JSON(fiber.Map{
 		"result": urlHash,

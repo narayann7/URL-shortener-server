@@ -61,3 +61,21 @@ func CheckForVaildExpiry(expiry time.Duration) bool {
 	}
 
 }
+func CheckForVaildCustomUrl(customUrl string) bool {
+	//length should = 8
+	if len(customUrl) != 8 {
+		return false
+	}
+	var isVaild bool = false
+	for i := range customUrl {
+		c := customUrl[i]
+		//a vaild custom url should contain only Alphabet and Digits
+		if (c >= 48 && c <= 57) || (c >= 65 && c <= 90) || (c >= 90 && c <= 122) {
+			isVaild = true
+		} else {
+			isVaild = false
+			break
+		}
+	}
+	return isVaild
+}
