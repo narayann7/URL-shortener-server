@@ -2,8 +2,10 @@ package routes
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/narayann7/gourl/database"
 	"github.com/narayann7/gourl/models"
 	srv "github.com/narayann7/gourl/services"
 )
@@ -42,6 +44,14 @@ func MakeShortUrl(c *fiber.Ctx) error {
 
 	}
 
+	//check for vaild expiry
+	if reqBody.Expiry == 0 {
+		//if expiry is 0 by default url is vaild for 1440 minutes which is 1 day
+		reqBody.Expiry = time.Minute * 1440
+	} else {
+		srv.CheckForVaildExpiry(reqBody.Expiry)
+	}
+
 	//check for domain error
 	if err := srv.CheckForDominError(reqBody.Url); !err {
 		panic(srv.AppError{
@@ -49,14 +59,15 @@ func MakeShortUrl(c *fiber.Ctx) error {
 			ErrorCode: 400,
 		})
 	}
-
 	//enforce http
 	reqBody.Url = srv.EnforceHttp(reqBody.Url)
-
-	srv.GetNewHash()
+	//create a unique hash for the url
+	urlHash := database.GetNewHash()
+	//store the url with url hash and expiry in db
+	database.SetUrlInDb(reqBody.Url, urlHash, reqBody.Expiry)
 
 	return c.JSON(fiber.Map{
-		"result": reqBody,
+		"result": urlHash,
 	})
 
 }

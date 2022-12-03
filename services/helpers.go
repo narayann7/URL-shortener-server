@@ -5,6 +5,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 )
 
 func IsVaildUrl(str string) bool {
@@ -44,5 +45,19 @@ func CheckForDominError(url string) bool {
 	newUrl = strings.Replace(url, "www.", "", 1)
 	newUrl = strings.Split(newUrl, "/")[0]
 	return newUrl != os.Getenv("DOMAIN")
+
+}
+func CheckForVaildExpiry(expiry time.Duration) bool {
+
+	//max limit of url is 1 day
+	//which means 24 * 60 = 1440 minutes
+	min := time.Minute
+	min = min * expiry
+
+	if min > 0 && min.Minutes() <= 1440 {
+		return true
+	} else {
+		return false
+	}
 
 }
