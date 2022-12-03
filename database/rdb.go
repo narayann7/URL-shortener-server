@@ -47,8 +47,7 @@ func SetUrlInDb(url string, urlHash string, expiry time.Duration) bool {
 	defer rdb0.Close()
 
 	status, err := rdb0.Set(Ctx, urlHash, url, expiry).Result()
-
-	if status == "OK" && err != nil {
+	if status == "OK" && err == nil {
 		return true
 	} else {
 		return false
