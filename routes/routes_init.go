@@ -7,7 +7,9 @@ import (
 
 func RoutesInit(app *fiber.App) {
 	app.Get("/:hash", GetUrl)
-	app.Get("/test/:hash", services.Test)
 	app.Post("gourl/api/make-short-url", MakeShortUrl)
+	app.Get("gourl/api/generate-customs-urls/:size", GenerateNewHashes)
 
+	//------------testing---------------
+	app.Get("/test/:hash", services.Test)
 }

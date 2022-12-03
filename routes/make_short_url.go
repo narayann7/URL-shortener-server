@@ -14,6 +14,9 @@ func MakeShortUrl(c *fiber.Ctx) error {
 	//recover the panic and send as respond
 	//with suitable message and status code
 	defer srv.CatchErrors(c)
+
+	//rate limiting
+
 	//create new request Struct
 	reqBody := new(models.Request)
 	//parce the json string to Request Struct
@@ -27,8 +30,6 @@ func MakeShortUrl(c *fiber.Ctx) error {
 			ErrorLocation: "from MakeShortUrl, json.Unmarshal",
 		})
 	}
-	//rate limiting
-
 	//	check for valid url
 	if !srv.IsVaildUrl(reqBody.Url) {
 		errorMessage := ""
@@ -49,8 +50,7 @@ func MakeShortUrl(c *fiber.Ctx) error {
 		//if expiry is 0 by default url is vaild for 1440 minutes which is 1 day
 		reqBody.Expiry = time.Minute * 1440
 	} else {
-		vaild := srv.CheckForVaildExpiry(&reqBody.Expiry)
-		if !vaild {
+		if vaild := srv.CheckForVaildExpiry(&reqBody.Expiry); !vaild {
 			panic(srv.AppError{
 				Message:   "invaild expiry. expiry will be in minutes",
 				ErrorCode: 400,
@@ -60,8 +60,7 @@ func MakeShortUrl(c *fiber.Ctx) error {
 
 	if len(reqBody.CustomShortUrl) != 0 {
 		//check for vaild custom url
-		isVaildCustomUrl := srv.CheckForVaildCustomUrl(reqBody.CustomShortUrl)
-		if !isVaildCustomUrl {
+		if isVaildCustomUrl := srv.CheckForVaildCustomUrl(reqBody.CustomShortUrl); !isVaildCustomUrl {
 			panic(srv.AppError{
 				Message:       "invaild custom Url",
 				RealMessage:   "custom Url should consist of Alphabets and digits and size of url should 8 in length",
@@ -77,6 +76,9 @@ func MakeShortUrl(c *fiber.Ctx) error {
 		}
 	} else {
 		reqBody.CustomShortUrl = ""
+		//create a unique hash for the url
+		urlHash := database.GetNewHash()
+		reqBody.CustomShortUrl = urlHash
 	}
 
 	//check for domain error
@@ -88,16 +90,8 @@ func MakeShortUrl(c *fiber.Ctx) error {
 	}
 	//enforce http
 	reqBody.Url = srv.EnforceHttp(reqBody.Url)
-
-	if reqBody.CustomShortUrl == "" {
-		//create a unique hash for the url
-		urlHash := database.GetNewHash()
-		reqBody.CustomShortUrl = urlHash
-	}
-
 	//store the url with url hash and expiry in db
-	result := database.SetUrlInDb(reqBody.Url, reqBody.CustomShortUrl, reqBody.Expiry)
-	if !result {
+	if result := database.SetUrlInDb(reqBody.Url, reqBody.CustomShortUrl, reqBody.Expiry); !result {
 		panic(srv.AppError{
 			Message:   "Something went wrong",
 			ErrorCode: 500,
@@ -106,7 +100,7 @@ func MakeShortUrl(c *fiber.Ctx) error {
 	resBody := models.Responce{
 		Url:    reqBody.Url,
 		NewUrl: reqBody.CustomShortUrl,
-		Expiry: reqBody.Expiry / time.Minute,
+		Expiry: reqBody.Expiry,
 	}
 
 	return c.JSON(fiber.Map{

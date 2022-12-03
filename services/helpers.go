@@ -6,6 +6,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/narayann7/gourl/database"
 )
 
 func IsVaildUrl(str string) bool {
@@ -55,7 +57,7 @@ func CheckForVaildExpiry(expiry *time.Duration) bool {
 	min = min * *expiry
 
 	if min > 0 && min.Minutes() <= 1440 {
-		*expiry = min
+		*expiry = min / time.Minute
 		return true
 	} else {
 		return false
@@ -102,4 +104,15 @@ func SendErrorHtml() string {
  </html>
  `
 
+}
+func GetNewHashes(size int) []string {
+
+	dataList := []string{}
+
+	for i := 0; i < size; i++ {
+		newHash := database.GetNewHash()
+		dataList = append(dataList, newHash)
+	}
+
+	return dataList
 }
