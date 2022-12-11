@@ -100,7 +100,7 @@ func MakeShortUrl(c *fiber.Ctx) error {
 	resBody := models.Responce{
 		Url:    reqBody.Url,
 		NewUrl: reqBody.CustomShortUrl,
-		Expiry: reqBody.Expiry,
+		Expiry: reqBody.Expiry / time.Minute,
 	}
 
 	return c.JSON(fiber.Map{

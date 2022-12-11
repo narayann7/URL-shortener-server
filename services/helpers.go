@@ -57,7 +57,7 @@ func CheckForVaildExpiry(expiry *time.Duration) bool {
 	min = min * *expiry
 
 	if min > 0 && min.Minutes() <= 1440 {
-		*expiry = min / time.Minute
+		*expiry = min
 		return true
 	} else {
 		return false

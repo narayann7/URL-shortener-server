@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -43,6 +44,7 @@ func GetNewHash() string {
 }
 
 func SetUrlInDb(url string, urlHash string, expiry time.Duration) bool {
+
 	rdb0 := DatabaseInit(0)
 	defer rdb0.Close()
 
@@ -60,6 +62,8 @@ func CheckIsHashUnique(hash string) bool {
 	defer rdb0.Close()
 
 	data, err := rdb0.Get(Ctx, hash).Result()
+	fmt.Println(data)
+	fmt.Println(err)
 	//if err is not nil which means the hash has no value to it
 	//and is not used for any url
 	//length of data == 0 means empty string came
