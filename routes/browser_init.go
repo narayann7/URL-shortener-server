@@ -33,11 +33,11 @@ func BrowserInit(c *fiber.Ctx) error {
 		}
 	} else {
 		quota, _ := strconv.Atoi(limit)
-
 		return c.JSON(fiber.Map{
 			"ip_address": c.IP(),
 			"api_quota":  quota,
 		})
 	}
-
 }
+
+

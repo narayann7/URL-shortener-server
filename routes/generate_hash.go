@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/narayann7/gourl/database"
 	srv "github.com/narayann7/gourl/services"
 )
 
@@ -13,6 +14,15 @@ func GenerateNewHashes(c *fiber.Ctx) error {
 	//recover the panic and send as respond
 	//with suitable message and status code
 	defer srv.CatchErrors(c)
+
+	//rate limiting
+	err := database.CounterReducer(c.IP())
+	if err != nil {
+		panic(srv.AppError{
+			Message:   err.Error(),
+			ErrorCode: 400,
+		})
+	}
 
 	//get size from parmas
 	size := c.Params("size")

@@ -6,7 +6,6 @@ import (
 )
 
 func RoutesInit(app *fiber.App) {
-	//------------testing---------------
 	app.Get("/test", services.Test)
 	app.Get("/:hash", GetUrl)
 	app.Get("gourl/api/init", BrowserInit)

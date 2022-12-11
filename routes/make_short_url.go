@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -16,11 +17,18 @@ func MakeShortUrl(c *fiber.Ctx) error {
 	defer srv.CatchErrors(c)
 
 	//rate limiting
+	err := database.CounterReducer(c.IP())
+	if err != nil {
+		panic(srv.AppError{
+			Message:   err.Error(),
+			ErrorCode: 400,
+		})
+	}
 
 	//create new request Struct
 	reqBody := new(models.Request)
 	//parce the json string to Request Struct
-	err := json.Unmarshal(c.Body(), reqBody)
+	err = json.Unmarshal(c.Body(), reqBody)
 	//if error painc
 	if err != nil {
 		panic(srv.AppError{
@@ -99,7 +107,7 @@ func MakeShortUrl(c *fiber.Ctx) error {
 	}
 	resBody := models.Responce{
 		Url:    reqBody.Url,
-		NewUrl: reqBody.CustomShortUrl,
+		NewUrl: os.Getenv("DOMAIN") + "/" + reqBody.CustomShortUrl,
 		Expiry: reqBody.Expiry / time.Minute,
 	}
 

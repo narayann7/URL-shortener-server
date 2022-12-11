@@ -2,8 +2,10 @@ package database
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -73,4 +75,30 @@ func CheckIsHashUnique(hash string) bool {
 		return false
 	}
 
+}
+func CounterReducer(ip string) error {
+	rdb1 := DatabaseInit(1)
+	defer rdb1.Close()
+
+	quota, err := rdb1.Get(Ctx, ip).Result()
+	if err != nil {
+		if err == redis.Nil {
+			return errors.New("rate limit exceeded.reload the limit")
+		} else {
+			return err
+		}
+	}
+	timeRemaining, _ := rdb1.Get(Ctx, ip).Time()
+	quotaInInt, err := strconv.Atoi(quota)
+	if err != nil {
+		return err
+	}
+	if quotaInInt <= 0 {
+		return errors.New("rate limit exceeded, please try after :" + timeRemaining.String())
+	}
+	_, err = rdb1.Decr(Ctx, ip).Result()
+	if err != nil {
+		return err
+	}
+	return nil
 }
