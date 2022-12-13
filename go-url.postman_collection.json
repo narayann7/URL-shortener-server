@@ -1,0 +1,148 @@
+{
+	"info": {
+		"_postman_id": "bee0da12-30e1-46ce-8c8f-8fa4eeeb101d",
+		"name": "go-url",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16186534"
+	},
+	"item": [
+		{
+			"name": "get-url",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3030/yoyoyoyo",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"yoyoyoyo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "test",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3030/yoyoyoyo",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"yoyoyoyo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "init",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3030/gourl/api/init",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"gourl",
+						"api",
+						"init"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "init Copy",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3030/gourl/api/reload-limit",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"gourl",
+						"api",
+						"reload-limit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "make-short-url",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"url\":\"https://google.com/drive\",\r\n\"expiry\":10\r\n\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3030/gourl/api/make-short-url",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"gourl",
+						"api",
+						"make-short-url"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "generate-customs-urls/:size",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"url\":\"google.com\",\r\n\"expiry\":-1,\r\n\"custom_short_url\":\"hello\"\r\n\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3030/gourl/api/generate-customs-urls/0",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"gourl",
+						"api",
+						"generate-customs-urls",
+						"0"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

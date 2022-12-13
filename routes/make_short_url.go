@@ -12,6 +12,8 @@ import (
 )
 
 func MakeShortUrl(c *fiber.Ctx) error {
+	rdb1 := database.DatabaseInit(1)
+	defer rdb1.Close()
 	//recover the panic and send as respond
 	//with suitable message and status code
 	defer srv.CatchErrors(c)
@@ -105,10 +107,13 @@ func MakeShortUrl(c *fiber.Ctx) error {
 			ErrorCode: 500,
 		})
 	}
+	timeRemaining, _ := rdb1.TTL(database.Ctx, c.IP()).Result()
+
 	resBody := models.Responce{
-		Url:    reqBody.Url,
-		NewUrl: os.Getenv("DOMAIN") + "/" + reqBody.CustomShortUrl,
-		Expiry: reqBody.Expiry / time.Minute,
+		Url:           reqBody.Url,
+		NewUrl:        "http://" + os.Getenv("DOMAIN") + "/" + reqBody.CustomShortUrl,
+		Expiry:        reqBody.Expiry / time.Minute,
+		RateRemaining: timeRemaining.String(),
 	}
 
 	return c.JSON(fiber.Map{

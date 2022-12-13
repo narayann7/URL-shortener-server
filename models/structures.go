@@ -12,5 +12,5 @@ type Responce struct {
 	Url           string        `json:"url"`
 	NewUrl        string        `json:"new_url"`
 	Expiry        time.Duration `json:"expiry"`
-	RateRemaining int           `json:"rate_remaining"`
+	RateRemaining string        `json:"rate_remaining"`
 }

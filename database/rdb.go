@@ -77,25 +77,32 @@ func CheckIsHashUnique(hash string) bool {
 
 }
 func CounterReducer(ip string) error {
+
 	rdb1 := DatabaseInit(1)
 	defer rdb1.Close()
-
+	//get the counter of ip
 	quota, err := rdb1.Get(Ctx, ip).Result()
+
 	if err != nil {
+		//this means rate limit is over
 		if err == redis.Nil {
 			return errors.New("rate limit exceeded.reload the limit")
 		} else {
 			return err
 		}
 	}
-	timeRemaining, _ := rdb1.Get(Ctx, ip).Time()
+	//to get the time remaining
+	timeRemaining, _ := rdb1.TTL(Ctx, ip).Result()
+
 	quotaInInt, err := strconv.Atoi(quota)
 	if err != nil {
 		return err
 	}
+	//limit less than 0
 	if quotaInInt <= 0 {
-		return errors.New("rate limit exceeded, please try after :" + timeRemaining.String())
+		return errors.New("rate limit exceeded, please try after : " + timeRemaining.String())
 	}
+	//decrement the counter
 	_, err = rdb1.Decr(Ctx, ip).Result()
 	if err != nil {
 		return err
